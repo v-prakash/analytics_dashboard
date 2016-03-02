@@ -1,0 +1,8 @@
+<component name="libraryTable">
+  <library name="org.springframework:spring-jdbc:4.2.4.RELEASE" type="repository">
+    <properties maven-id="org.springframework:spring-jdbc:4.2.4.RELEASE" />
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
