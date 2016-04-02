@@ -24,4 +24,6 @@ public interface ArchiveRunService {
 
     Collection<ArchiveRun> findArchiveRuns() throws DataAccessException;
 
+    Collection<ArchiveRun> findArchiveRun(String entity) throws DataAccessException;
+
 }

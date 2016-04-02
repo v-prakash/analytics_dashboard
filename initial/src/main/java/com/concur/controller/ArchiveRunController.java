@@ -1,6 +1,7 @@
 package com.concur.controller;
 
 import com.concur.model.ArchiveRun;
+import com.concur.model.EntityInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,9 +17,6 @@ public class ArchiveRunController {
     @Autowired
     private ArchiveRunService archiveRunService;
 
-    // @Autowired
-    // private ArchiveRunDao archiveRunDao;
-
     public ArchiveRunController() {
         System.out.println("in archive run controller constructor");
     }
@@ -32,13 +30,23 @@ public class ArchiveRunController {
     public
     @ResponseBody
     ArchiveRun showArchiveRun() {
-        // ArchiveRun run = new ArchiveRun();
         System.out.println("in archive run function");
 
         List<ArchiveRun> archiveRuns
                 = new ArrayList<>(archiveRunService.findArchiveRuns());
 
         return archiveRuns.get(0);
-//        return run;
+    }
+
+    @RequestMapping("/new_run.json")
+    public
+    @ResponseBody
+    ArchiveRun showNewArchiveRun() {
+        System.out.println("in new archive run function");
+
+        List<ArchiveRun> archiveRuns
+                = new ArrayList<>(archiveRunService.findArchiveRun("phos_gov12"));
+
+        return archiveRuns.get(0);
     }
 }

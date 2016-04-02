@@ -38,4 +38,13 @@ public interface ArchiveRunDao {
      */
     Collection<ArchiveRun> findArchiveRuns() throws DataAccessException;
 
+
+    /**
+     * Return Archive Runs for a specific entity
+     * @param entity
+     * @return
+     * @throws DataAccessException
+     */
+    Collection<ArchiveRun> findArchiveRun(String entity) throws DataAccessException;
+
 }

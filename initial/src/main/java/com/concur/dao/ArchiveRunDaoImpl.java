@@ -16,12 +16,17 @@
 package com.concur.dao;
 
 import com.concur.model.ArchiveRun;
+import com.concur.model.EntityInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.util.Collection;
 
 /**
@@ -35,16 +40,22 @@ import java.util.Collection;
 @Repository
 public class ArchiveRunDaoImpl implements ArchiveRunDao {
 
-    @Autowired
+//    @Autowired
+    @Qualifier("jdbcDW")
     private JdbcTemplate jdbcTemplate;
 
-    public ArchiveRunDaoImpl() {
+    private DataSource dataSource;
 
+    @Autowired
+    private HostDaoImpl hostDaoImpl;
+
+    public ArchiveRunDaoImpl() {
     }
 
     @Override
     public Collection<ArchiveRun> findArchiveRuns() throws DataAccessException {
         System.out.println("in archive run com.concur.dao impl");
+
         return this.jdbcTemplate.query(
                 "SELECT  etl_batch_key job_key, etl_status job_status, " +
                 "DATEDIFF(MINUTE, etl_start_dttm, etl_end_dttm) job_duration " +
@@ -52,6 +63,38 @@ public class ArchiveRunDaoImpl implements ArchiveRunDao {
                 "WHERE job_type = 'DW_GEXP_ARCHIVE' " +
                 "AND etl_status NOT IN ('RUNNING') " +
                 "ORDER BY etl_batch_key",
+                BeanPropertyRowMapper.newInstance(ArchiveRun.class));
+    }
+
+
+    /**
+     * based on the entity connection info, build the datasource object
+     * @param entityInfo
+     * @return
+     */
+    public DataSource getDataSource(EntityInfo entityInfo) {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("net.sourceforge.jtds.jdbc.Driver");
+        dataSource.setUrl("jdbc:jtds:sqlserver://192.168.24.145:1433/"+
+                entityInfo.getSchemaName()+";user="+entityInfo.getUsername()+";password=4wg");
+        dataSource.setUsername(entityInfo.getUsername());
+//        dataSource.setPassword("4wg");
+
+        return dataSource;
+    }
+
+    @Override
+    public Collection<ArchiveRun> findArchiveRun(String entity) throws DataAccessException {
+        EntityInfo entityInfo = hostDaoImpl.getEntityKey(entity);
+        jdbcTemplate = new JdbcTemplate(getDataSource(entityInfo));
+
+        return this.jdbcTemplate.query(
+                "SELECT  etl_batch_key job_key, etl_status job_status, " +
+                        "DATEDIFF(MINUTE, etl_start_dttm, etl_end_dttm) job_duration " +
+                        "FROM dbo.dim_etl_batch " +
+                        "WHERE job_type = 'DW_GEXP_ARCHIVE' " +
+                        "AND etl_status NOT IN ('RUNNING') " +
+                        "ORDER BY etl_batch_key",
                 BeanPropertyRowMapper.newInstance(ArchiveRun.class));
     }
 }

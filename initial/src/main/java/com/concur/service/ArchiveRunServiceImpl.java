@@ -18,8 +18,11 @@ public class ArchiveRunServiceImpl implements ArchiveRunService {
 
     @Override
     public Collection<ArchiveRun> findArchiveRuns() throws DataAccessException {
-        System.out.println("in archive run com.concur.service impl");
         return archiveRunDao.findArchiveRuns();
     }
 
+    @Override
+    public Collection<ArchiveRun> findArchiveRun(String entity) throws DataAccessException {
+        return archiveRunDao.findArchiveRun(entity);
+    }
 }
